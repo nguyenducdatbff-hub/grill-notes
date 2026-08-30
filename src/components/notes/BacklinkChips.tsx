@@ -33,7 +33,7 @@ export function BacklinkChips({ body }: { body: string }) {
     <div className="flex flex-wrap gap-2">
       {titles.map((t) =>
         found[t] ? (
-          <Link key={t} href={`/app/notes/${found[t]}`} className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-700 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-200">
+          <Link key={t} href={`/app/notes/${found[t]}`} className="rounded-full bg-[var(--border)] px-3 py-1 text-xs text-[var(--text)] hover:opacity-80">
             [[{t}]]
           </Link>
         ) : (

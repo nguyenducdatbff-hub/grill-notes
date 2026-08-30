@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 :root { --bg: #fafafa; --surface: #ffffff; --border: #e5e5e5; --text: #171717; --muted: #737373; }
 [data-theme="dark"] { --bg: #0a0a0a; --surface: #171717; --border: #262626; --text: #f5f5f5; --muted: #a3a3a3; }
 [data-theme="sepia"] { --bg: #f7f0e3; --surface: #fffdf7; --border: #e2d5bd; --text: #3a3226; --muted: #8a7a5f; }
@@ -8,16 +15,6 @@
 
 html { background: var(--bg); color: var(--text); }
 body { background: var(--bg); color: var(--text); }
-
-@theme inline {
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-border: var(--border);
-  --color-text: var(--text);
-  --color-muted: var(--muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
 [cmdk-dialog] { background: rgb(0 0 0 / 0.4); position: fixed; inset: 0; z-index: 50; display: flex; justify-content: center; padding-top: 15vh; }
 [cmdk-root] { width: min(560px, 90vw); background: white; border-radius: 12px; padding: 8px; box-shadow: 0 20px 60px rgb(0 0 0 / 0.25); overflow: hidden; }

@@ -27,7 +27,7 @@ export function TagEditor({ noteId }: { noteId: string }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {tags.map((t) => (
-        <button key={t} onClick={() => { setTags(tags.filter((x) => x !== t)); dirty.current = true; }} className="rounded-full bg-neutral-100 px-3 py-1 text-xs dark:bg-neutral-800">
+        <button key={t} onClick={() => { setTags(tags.filter((x) => x !== t)); dirty.current = true; }} className="rounded-full bg-[var(--border)] px-3 py-1 text-xs">
           #{t} ×
         </button>
       ))}
