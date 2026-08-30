@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Eye, Pencil } from "lucide-react";
 import { Markdown } from "./Markdown";
 import { BacklinkChips } from "./BacklinkChips";
+import { TagEditor } from "./TagEditor";
 
 export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: string; initialTitle: string; initialBody: string }) {
   const [title, setTitle] = useState(initialTitle);
@@ -48,6 +49,9 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
           <button onClick={() => setMode("preview")} className={`rounded-md p-2 ${mode === "preview" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Preview"><Eye size={16} /></button>
           <span className="ml-2 text-xs text-neutral-400">{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Error" : ""}</span>
         </div>
+      </div>
+      <div className="mb-2">
+        <TagEditor noteId={noteId} />
       </div>
       <div className={`flex min-h-0 flex-1 gap-3 ${mode === "split" ? "flex-col md:flex-row" : ""}`}>
         {showEdit && (
