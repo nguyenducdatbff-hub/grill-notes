@@ -15,26 +15,26 @@ export default async function LandingPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-20">
       <header className="mb-16 text-center">
-        <p className="mb-4 text-sm font-medium uppercase tracking-widest text-neutral-400">Grill</p>
+        <p className="mb-4 text-sm font-medium uppercase tracking-widest text-[var(--muted)]">Grill</p>
         <h1 className="mx-auto mb-6 max-w-2xl text-4xl font-semibold leading-tight md:text-6xl">
           Notes that remember,<br />focus that compounds.
         </h1>
-        <p className="mx-auto mb-8 max-w-xl text-lg text-neutral-500">
+        <p className="mx-auto mb-8 max-w-xl text-lg text-[var(--muted)]">
           Markdown notes, backlinks, an AI that reviews your thinking, and a Pomodoro timer — in one calm workspace.
         </p>
-        <Link href={user ? "/app/notes" : "/register"} className="rounded-full bg-neutral-900 px-6 py-3 text-white transition hover:opacity-90 dark:bg-neutral-100 dark:text-black">
+        <Link href={user ? "/app/notes" : "/register"} className="rounded-full bg-foreground px-6 py-3 text-background transition hover:opacity-90">
           {user ? "Open your workspace" : "Start for free"}
         </Link>
       </header>
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {FEATURES.map((f) => (
-          <div key={f.title} className="rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 className="mb-1 font-medium">{f.title}</h2>
-            <p className="text-sm text-neutral-500">{f.desc}</p>
+          <div key={f.title} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
+            <h2 className="mb-1 font-medium text-[var(--text)]">{f.title}</h2>
+            <p className="text-sm text-[var(--muted)]">{f.desc}</p>
           </div>
         ))}
       </section>
-      <footer className="mt-20 text-center text-xs text-neutral-400">Built with Grill · markdown in, markdown out.</footer>
+      <footer className="mt-20 text-center text-xs text-[var(--muted)]">Built with Grill · markdown in, markdown out.</footer>
     </main>
   );
 }
