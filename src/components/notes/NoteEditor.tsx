@@ -1,16 +1,18 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Eye, Pencil } from "lucide-react";
+import { Eye, Pencil, Sparkles } from "lucide-react";
 import { Markdown } from "./Markdown";
 import { BacklinkChips } from "./BacklinkChips";
 import { TagEditor } from "./TagEditor";
 import { ImageUploader } from "./ImageUploader";
+import { AiPanel } from "../ai/AiPanel";
 
 export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: string; initialTitle: string; initialBody: string }) {
   const [title, setTitle] = useState(initialTitle);
   const [body, setBody] = useState(initialBody);
   const [mode, setMode] = useState<"edit" | "preview" | "split">("split");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [aiOpen, setAiOpen] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveSeq = useRef(0);
   const dirty = useRef(false);
@@ -49,13 +51,14 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
           <button onClick={() => setMode("edit")} className={`rounded-md p-2 ${mode === "edit" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Edit"><Pencil size={16} /></button>
           <button onClick={() => setMode("preview")} className={`rounded-md p-2 ${mode === "preview" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Preview"><Eye size={16} /></button>
           <ImageUploader noteId={noteId} onInsert={(md) => setBody((b) => b + md)} />
+          <button onClick={() => setAiOpen((v) => !v)} className={`rounded-md p-2 ${aiOpen ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="AI"><Sparkles size={16} /></button>
           <span className="ml-2 text-xs text-neutral-400">{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Error" : ""}</span>
         </div>
       </div>
       <div className="mb-2">
         <TagEditor noteId={noteId} />
       </div>
-      <div className={`flex min-h-0 flex-1 gap-3 ${mode === "split" ? "flex-col md:flex-row" : ""}`}>
+      <div className={`flex min-h-0 flex-1 gap-3 ${mode === "split" || aiOpen ? "flex-col md:flex-row" : ""}`}>
         {showEdit && (
           <textarea value={body} onChange={(e) => { dirty.current = true; setBody(e.target.value); }} placeholder="Write in markdown… [[link]] to another note" className="min-h-40 flex-1 resize-none rounded-lg border border-neutral-200 bg-white p-4 font-mono text-sm outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600" />
         )}
@@ -64,6 +67,7 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
             <Markdown content={body} />
           </div>
         )}
+        {aiOpen && <AiPanel noteId={noteId} onClose={() => setAiOpen(false)} />}
       </div>
       <div className="mt-3 shrink-0">
         <BacklinkChips body={body} />

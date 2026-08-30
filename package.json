@@ -18,6 +18,7 @@
     "@ai-sdk/google": "^4.0.57",
     "@ai-sdk/openai": "^4.0.51",
     "@ai-sdk/openai-compatible": "^3.0.40",
+    "@ai-sdk/react": "^4.0.87",
     "@better-auth/cli": "^1.4.22",
     "@ducanh2912/next-pwa": "^10.2.9",
     "ai": "^7.0.84",
