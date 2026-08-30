@@ -4,6 +4,7 @@ import { Eye, Pencil } from "lucide-react";
 import { Markdown } from "./Markdown";
 import { BacklinkChips } from "./BacklinkChips";
 import { TagEditor } from "./TagEditor";
+import { ImageUploader } from "./ImageUploader";
 
 export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: string; initialTitle: string; initialBody: string }) {
   const [title, setTitle] = useState(initialTitle);
@@ -47,6 +48,7 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
         <div className="flex shrink-0 items-center gap-1">
           <button onClick={() => setMode("edit")} className={`rounded-md p-2 ${mode === "edit" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Edit"><Pencil size={16} /></button>
           <button onClick={() => setMode("preview")} className={`rounded-md p-2 ${mode === "preview" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Preview"><Eye size={16} /></button>
+          <ImageUploader noteId={noteId} onInsert={(md) => setBody((b) => b + md)} />
           <span className="ml-2 text-xs text-neutral-400">{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Error" : ""}</span>
         </div>
       </div>
