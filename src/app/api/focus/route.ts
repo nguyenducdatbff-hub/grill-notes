@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { and, desc, eq, gte } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { focusSessions } from "@/db/schema";
@@ -24,4 +25,13 @@ export async function POST(req: Request) {
     completed: body.completed,
   });
   return NextResponse.json({ ok: true }, { status: 201 });
+}
+
+export async function GET(req: Request) {
+  const user = await requireUser();
+  const from = new URL(req.url).searchParams.get("from");
+  const rows = await db.select().from(focusSessions)
+    .where(and(...(from ? [gte(focusSessions.startAt, new Date(from))] : []), eq(focusSessions.userId, user.id)))
+    .orderBy(desc(focusSessions.startAt)).limit(50);
+  return NextResponse.json(rows);
 }

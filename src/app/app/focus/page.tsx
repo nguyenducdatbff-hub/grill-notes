@@ -4,6 +4,7 @@ import { Maximize2 } from "lucide-react";
 import { Timer } from "@/components/pomodoro/Timer";
 import { FocusMode } from "@/components/pomodoro/FocusMode";
 import { MiniTasks } from "@/components/pomodoro/MiniTasks";
+import { FocusStats } from "@/components/pomodoro/FocusStats";
 
 export default function FocusPage() {
   const [focused, setFocused] = useState(false);
@@ -19,6 +20,7 @@ export default function FocusPage() {
       <button onClick={() => setFocused(true)} className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white"><Maximize2 size={14} /> Enter focus mode</button>
       <Timer onComplete={(p, s) => record(p, s)} />
       <MiniTasks />
+      <FocusStats />
       {focused && <FocusMode onClose={() => setFocused(false)} onComplete={(s) => record("pomodoro", s)} />}
     </div>
   );
