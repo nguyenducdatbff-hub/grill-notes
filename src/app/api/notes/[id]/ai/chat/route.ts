@@ -19,8 +19,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   const body = (await req.json()) as { messages?: { role: string; content?: string; parts?: unknown[] }[] };
   const raw = body.messages ?? [];
-  const messages: UIMessage[] = raw.map((m) =>
-    m.parts ? (m as UIMessage) : { role: m.role as UIMessage["role"], parts: [{ type: "text", text: m.content ?? "" }] }
+  const messages: UIMessage[] = raw.map((m, i) =>
+    m.parts ? (m as UIMessage) : { id: `m-${i}`, role: m.role as UIMessage["role"], parts: [{ type: "text", text: m.content ?? "" }] }
   );
   const titleRows = await db.select({ title: notes.title }).from(notes).where(eq(notes.userId, user.id));
   const titles = titleRows.map((n) => n.title);
