@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Wand2 } from "lucide-react";
 import { Markdown } from "@/components/notes/Markdown";
-import { todayStr } from "@/lib/digest";
+import { todayStr } from "@/lib/date";
 
 export default function DigestPage() {
   const [date, setDate] = useState(todayStr());

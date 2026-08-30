@@ -1,4 +1,7 @@
 import { connection } from "@/db";
+import { todayStr } from "./date";
+
+export { todayStr };
 
 export type DigestInput = {
   dateStr: string;
@@ -7,10 +10,6 @@ export type DigestInput = {
   focusSecs: number;
   focusSessions: number;
 };
-
-export function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 export async function buildDigestInput(userId: string, dateStr: string): Promise<DigestInput> {
   const today = new Date(`${dateStr}T00:00:00Z`);
