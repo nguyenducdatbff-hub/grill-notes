@@ -46,6 +46,23 @@ export default function SettingsPage() {
         {msg && <p className="text-sm text-neutral-500">{msg}</p>}
         <p className="text-xs text-neutral-400">Keys never leave the server. Bring your own provider key.</p>
       </section>
+      <section className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+        <h2 className="font-medium">Data</h2>
+        <a href="/api/export" className="inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm text-white dark:bg-neutral-100 dark:text-black">Export all notes (.zip)</a>
+        <label className="block text-sm">
+          Import .zip of markdown files
+          <input type="file" accept=".zip" className="mt-1 block w-full text-sm" onChange={async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const form = new FormData();
+            form.append("file", f);
+            const res = await fetch("/api/import", { method: "POST", body: form });
+            const r = await res.json();
+            alert(`Imported ${r.count ?? 0} notes.`);
+            e.target.value = "";
+          }} />
+        </label>
+      </section>
     </div>
   );
 }
