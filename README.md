@@ -4,7 +4,7 @@ A notes / AI / focus web app built with Next.js, Postgres, and Drizzle.
 
 ## Local development
 
-Prerequisites: Node.js 20+, a local Postgres database.
+Prerequisites: Node.js 22+ (npm 11 recommended), a local Postgres database.
 
 ```bash
 npm install
