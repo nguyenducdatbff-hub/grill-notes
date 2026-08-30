@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
-import { images } from "@/db/schema";
+import { images, notes } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { validateImage } from "@/lib/images";
 
@@ -13,7 +14,12 @@ export async function POST(req: Request) {
   const err = validateImage(file.type, file.size);
   if (err) return NextResponse.json({ error: err.message }, { status: 400 });
   const noteIdRaw = form.get("noteId");
-  const noteId = typeof noteIdRaw === "string" && z.string().uuid().safeParse(noteIdRaw).success ? noteIdRaw : null;
+  let noteId: string | null = null;
+  if (noteIdRaw && typeof noteIdRaw === "string" && z.string().uuid().safeParse(noteIdRaw).success) {
+    const [note] = await db.select().from(notes).where(and(eq(notes.id, noteIdRaw), eq(notes.userId, user.id)));
+    if (!note) return NextResponse.json({ error: "Note not found" }, { status: 404 });
+    noteId = noteIdRaw;
+  }
   const buffer = Buffer.from(await file.arrayBuffer());
   const [row] = await db.insert(images).values({
     userId: user.id, noteId, data: buffer, mime: file.type, size: buffer.length,
