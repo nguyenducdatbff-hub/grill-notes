@@ -7,6 +7,8 @@ import { TagEditor } from "./TagEditor";
 import { ImageUploader } from "./ImageUploader";
 import { AiPanel } from "../ai/AiPanel";
 import { SelectionActions } from "../ai/SelectionActions";
+import { EvaluateBanner } from "../ai/EvaluateBanner";
+import type { Evaluation } from "@/lib/ai.evaluate";
 
 export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: string; initialTitle: string; initialBody: string }) {
   const [title, setTitle] = useState(initialTitle);
@@ -15,10 +17,13 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [aiOpen, setAiOpen] = useState(false);
   const [pendingAi, setPendingAi] = useState<string | null>(null);
+  const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [savedSnap, setSavedSnap] = useState<{ title: string; body: string } | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const saveSeq = useRef(0);
   const dirty = useRef(false);
+  const editSeq = useRef(0);
 
   useEffect(() => {
     if (!dirty.current) return;
@@ -28,7 +33,10 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
       try {
         const res = await fetch(`/api/notes/${noteId}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ title, body }) });
         if (!res.ok) throw new Error("save failed");
-        if (seq === saveSeq.current) setStatus("saved");
+        if (seq === saveSeq.current) {
+          setStatus("saved");
+          setSavedSnap({ title, body });
+        }
       } catch {
         if (seq === saveSeq.current) setStatus("error");
       }
@@ -43,6 +51,21 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
     }
   }, [status]);
 
+  useEffect(() => {
+    if (!savedSnap || body !== savedSnap.body) return;
+    const seq = editSeq.current;
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/notes/${noteId}/ai/evaluate`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(savedSnap) });
+        if (!res.ok || editSeq.current !== seq) return;
+        setEvaluation(await res.json());
+      } catch {
+        // evaluation is best-effort; ignore failures
+      }
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [savedSnap, body, noteId]);
+
   const showEdit = mode === "edit" || mode === "split";
   const showPreview = mode === "preview" || mode === "split";
 
@@ -53,6 +76,8 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
         const start = ta.selectionStart;
         const end = ta.selectionEnd;
         dirty.current = true;
+        editSeq.current++;
+        setEvaluation(null);
         setBody((b) => b.slice(0, start) + result + b.slice(end));
         requestAnimationFrame(() => {
           ta.focus();
@@ -72,7 +97,7 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
         <div className="flex shrink-0 items-center gap-1">
           <button onClick={() => setMode("edit")} className={`rounded-md p-2 ${mode === "edit" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Edit"><Pencil size={16} /></button>
           <button onClick={() => setMode("preview")} className={`rounded-md p-2 ${mode === "preview" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Preview"><Eye size={16} /></button>
-          <ImageUploader noteId={noteId} onInsert={(md) => setBody((b) => b + md)} />
+          <ImageUploader noteId={noteId} onInsert={(md) => { editSeq.current++; setEvaluation(null); setBody((b) => b + md); }} />
           <button onClick={() => setAiOpen((v) => !v)} className={`rounded-md p-2 ${aiOpen ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="AI"><Sparkles size={16} /></button>
           <span className="ml-2 text-xs text-neutral-400">{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Error" : ""}</span>
         </div>
@@ -80,9 +105,10 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
       <div className="mb-2">
         <TagEditor noteId={noteId} />
       </div>
+      {evaluation && <EvaluateBanner ev={evaluation} onClose={() => setEvaluation(null)} />}
       <div className={`flex min-h-0 flex-1 gap-3 ${mode === "split" || aiOpen ? "flex-col md:flex-row" : ""}`}>
         {showEdit && (
-          <textarea ref={textareaRef} value={body} onChange={(e) => { dirty.current = true; setBody(e.target.value); }} placeholder="Write in markdown… [[link]] to another note" className="min-h-40 flex-1 resize-none rounded-lg border border-neutral-200 bg-white p-4 font-mono text-sm outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600" />
+          <textarea ref={textareaRef} value={body} onChange={(e) => { dirty.current = true; editSeq.current++; setEvaluation(null); setBody(e.target.value); }} placeholder="Write in markdown… [[link]] to another note" className="min-h-40 flex-1 resize-none rounded-lg border border-neutral-200 bg-white p-4 font-mono text-sm outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600" />
         )}
         {showPreview && (
           <div className="min-h-40 flex-1 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
