@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, uuid, integer, index, primaryKey, customType } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, uuid, integer, index, uniqueIndex, primaryKey, customType } from "drizzle-orm/pg-core";
 
 const bytea = customType<{ data: Uint8Array }>({ dataType: () => "bytea" });
 
@@ -28,6 +28,7 @@ export const accounts = pgTable("account", {
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
+  issuer: text("issuer").notNull(),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   accessTokenExpiresAt: timestamp("access_token_expires_at"),
@@ -37,7 +38,7 @@ export const accounts = pgTable("account", {
   password: text("password"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (t) => [uniqueIndex("account_issuer_account_idx").on(t.issuer, t.accountId)]);
 
 export const verifications = pgTable("verification", {
   id: text("id").primaryKey(),
