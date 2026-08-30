@@ -15,8 +15,8 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="hidden text-sm text-neutral-600 sm:inline dark:text-neutral-300">{data?.user?.email}</span>
-      <button onClick={signOut} title="Sign out" className="rounded-md p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+      <span className="hidden text-sm text-[var(--muted)] sm:inline">{data?.user?.email}</span>
+      <button onClick={signOut} title="Sign out" className="rounded-md p-2 text-[var(--muted)] hover:bg-[var(--border)]">
         <LogOut size={16} />
       </button>
     </div>

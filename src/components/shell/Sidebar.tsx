@@ -15,13 +15,13 @@ const items = [
 export function Sidebar() {
   const pathname = usePathname();
   return (
-    <aside className="hidden w-56 shrink-0 border-r border-neutral-200 bg-white p-4 md:block dark:border-neutral-800 dark:bg-neutral-900">
+    <aside className="hidden w-56 shrink-0 border-r border-[var(--border)] bg-[var(--surface)] p-4 md:block">
       <Link href="/app/notes" className="mb-6 block text-lg font-semibold">Grill</Link>
       <nav className="space-y-1">
         {items.map(({ href, label, icon: Icon }) => {
           const active = pathname.startsWith(href);
           return (
-            <Link key={href} href={href} className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${active ? "bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black" : "text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"}`}>
+            <Link key={href} href={href} className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${active ? "bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black" : "text-[var(--muted)] hover:bg-[var(--border)]"}`}>
               <Icon size={16} /> {label}
             </Link>
           );

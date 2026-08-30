@@ -32,17 +32,17 @@ export function NoteList({ initial }: { initial: NoteRow[] }) {
       </div>
       <ul className="space-y-2">
         {notes.map((n) => (
-          <li key={n.id} className="group flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+          <li key={n.id} className="group flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4">
             <button className="min-w-0 flex-1 text-left" onClick={() => router.push(`/app/notes/${n.id}`)}>
               <span className="block truncate font-medium">{n.title}</span>
-              <span className="text-xs text-neutral-500">{new Date(n.updatedAt).toLocaleString()}</span>
+              <span className="text-xs text-[var(--muted)]">{new Date(n.updatedAt).toLocaleString()}</span>
             </button>
-            <button onClick={() => remove(n.id)} className="ml-2 rounded-md p-2 text-neutral-400 opacity-0 transition group-hover:opacity-100 hover:text-red-600" aria-label="Delete">
+            <button onClick={() => remove(n.id)} className="ml-2 rounded-md p-2 text-[var(--muted)] opacity-0 transition group-hover:opacity-100 hover:text-red-600" aria-label="Delete">
               <Trash2 size={16} />
             </button>
           </li>
         ))}
-        {notes.length === 0 && <li className="rounded-lg border border-dashed p-8 text-center text-neutral-500">No notes yet. Create your first one.</li>}
+        {notes.length === 0 && <li className="rounded-lg border border-dashed p-8 text-center text-[var(--muted)]">No notes yet. Create your first one.</li>}
       </ul>
     </div>
   );

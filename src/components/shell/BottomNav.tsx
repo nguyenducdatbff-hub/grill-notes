@@ -14,11 +14,11 @@ const items = [
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-neutral-200 bg-white/95 backdrop-blur md:hidden dark:border-neutral-800 dark:bg-neutral-900/95">
+    <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-[var(--border)] bg-[var(--surface)]/95 backdrop-blur md:hidden">
       {items.map(({ href, label, icon: Icon }) => {
         const active = pathname.startsWith(href);
         return (
-          <Link key={href} href={href} className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] ${active ? "text-neutral-900 dark:text-white" : "text-neutral-500"}`}>
+          <Link key={href} href={href} className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] ${active ? "text-[var(--text)]" : "text-[var(--muted)]"}`}>
             <Icon size={18} /> {label}
           </Link>
         );

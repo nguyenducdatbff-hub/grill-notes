@@ -95,11 +95,11 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
       <div className="mb-2 flex items-center justify-between gap-2">
         <input value={title} onChange={(e) => { dirty.current = true; setTitle(e.target.value); }} placeholder="Untitled" className="w-full bg-transparent text-2xl font-semibold outline-none" />
         <div className="flex shrink-0 items-center gap-1">
-          <button onClick={() => setMode("edit")} className={`rounded-md p-2 ${mode === "edit" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Edit"><Pencil size={16} /></button>
-          <button onClick={() => setMode("preview")} className={`rounded-md p-2 ${mode === "preview" ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="Preview"><Eye size={16} /></button>
+          <button onClick={() => setMode("edit")} className={`rounded-md p-2 ${mode === "edit" ? "bg-[var(--border)]" : "text-[var(--muted)]"}`} title="Edit"><Pencil size={16} /></button>
+          <button onClick={() => setMode("preview")} className={`rounded-md p-2 ${mode === "preview" ? "bg-[var(--border)]" : "text-[var(--muted)]"}`} title="Preview"><Eye size={16} /></button>
           <ImageUploader noteId={noteId} onInsert={(md) => { editSeq.current++; setEvaluation(null); setBody((b) => b + md); }} />
-          <button onClick={() => setAiOpen((v) => !v)} className={`rounded-md p-2 ${aiOpen ? "bg-neutral-200 dark:bg-neutral-800" : "text-neutral-400"}`} title="AI"><Sparkles size={16} /></button>
-          <span className="ml-2 text-xs text-neutral-400">{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Error" : ""}</span>
+          <button onClick={() => setAiOpen((v) => !v)} className={`rounded-md p-2 ${aiOpen ? "bg-[var(--border)]" : "text-[var(--muted)]"}`} title="AI"><Sparkles size={16} /></button>
+          <span className="ml-2 text-xs text-[var(--muted)]">{status === "saving" ? "Saving…" : status === "saved" ? "Saved" : status === "error" ? "Error" : ""}</span>
         </div>
       </div>
       <div className="mb-2">
@@ -108,10 +108,10 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
       {evaluation && <EvaluateBanner ev={evaluation} onClose={() => setEvaluation(null)} />}
       <div className={`flex min-h-0 flex-1 gap-3 ${mode === "split" || aiOpen ? "flex-col md:flex-row" : ""}`}>
         {showEdit && (
-          <textarea ref={textareaRef} value={body} onChange={(e) => { dirty.current = true; editSeq.current++; setEvaluation(null); setBody(e.target.value); }} placeholder="Write in markdown… [[link]] to another note" className="min-h-40 flex-1 resize-none rounded-lg border border-neutral-200 bg-white p-4 font-mono text-sm outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600" />
+          <textarea ref={textareaRef} value={body} onChange={(e) => { dirty.current = true; editSeq.current++; setEvaluation(null); setBody(e.target.value); }} placeholder="Write in markdown… [[link]] to another note" className="min-h-40 flex-1 resize-none rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 font-mono text-sm outline-none focus:border-[var(--muted)]" />
         )}
         {showPreview && (
-          <div className="min-h-40 flex-1 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="min-h-40 flex-1 overflow-y-auto rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4">
             <Markdown content={body} />
           </div>
         )}
