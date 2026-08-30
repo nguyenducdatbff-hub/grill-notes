@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Sparkles, X } from "lucide-react";
@@ -9,7 +9,15 @@ export function AiPanel({ noteId, onClose, seed }: { noteId: string; onClose: ()
     transport: new DefaultChatTransport({ api: `/api/notes/${noteId}/ai/chat` }),
   });
   const [input, setInput] = useState("");
+  const seedSent = useRef(false);
   const thinking = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    if (seed && !seedSent.current) {
+      seedSent.current = true;
+      sendMessage({ text: seed });
+    }
+  }, [seed, sendMessage]);
 
   return (
     <aside className="flex h-full w-full flex-col border-l border-[var(--border)] bg-[var(--surface)] md:w-80">
@@ -18,9 +26,6 @@ export function AiPanel({ noteId, onClose, seed }: { noteId: string; onClose: ()
         <button onClick={onClose} className="rounded p-1 text-[var(--muted)] hover:text-[var(--text)]"><X size={14} /></button>
       </div>
       <div className="flex-1 space-y-2 overflow-y-auto p-3 text-sm">
-        {seed && (
-          <div className="max-w-[90%] rounded-lg bg-[var(--border)] px-3 py-2">{seed}</div>
-        )}
         {messages.map((m) => (
           <div key={m.id} className={`max-w-[90%] rounded-lg px-3 py-2 ${m.role === "user" ? "ml-auto bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black" : "bg-[var(--border)]"}`}>
             {m.parts.map((p, i) => (p.type === "text" ? <span key={i}>{p.text}</span> : null))}

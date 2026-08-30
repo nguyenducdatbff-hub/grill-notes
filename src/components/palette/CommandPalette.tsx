@@ -22,7 +22,9 @@ export function CommandPalette() {
 
   async function newNote() {
     const res = await fetch("/api/notes", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    if (!res.ok) return;
     const note = await res.json();
+    setOpen(false);
     router.push(`/app/notes/${note.id}`);
   }
 

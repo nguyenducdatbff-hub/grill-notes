@@ -8,10 +8,9 @@ import { FocusStats } from "@/components/pomodoro/FocusStats";
 
 export default function FocusPage() {
   const [focused, setFocused] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
 
   async function record(preset: string, seconds: number) {
-    await fetch("/api/focus", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ preset, durationSec: seconds, startedAt: new Date(Date.now() - seconds * 1000).toISOString(), completed: true, noteId: note }) });
+    await fetch("/api/focus", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ preset, durationSec: seconds, startedAt: new Date(Date.now() - seconds * 1000).toISOString(), completed: true }) });
   }
 
   return (

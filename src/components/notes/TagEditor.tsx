@@ -7,13 +7,21 @@ export function TagEditor({ noteId }: { noteId: string }) {
   const dirty = useRef(false);
 
   useEffect(() => {
-    fetch(`/api/notes/${noteId}/tags`).then((r) => r.json()).then((names: string[]) => setTags(names));
+    let active = true;
+    fetch(`/api/notes/${noteId}/tags`).then((r) => r.json()).then((names: string[]) => {
+      if (active) setTags(names);
+    }).catch(() => {});
+    return () => { active = false; };
   }, [noteId]);
 
   useEffect(() => {
     if (!dirty.current) return;
     const t = setTimeout(async () => {
-      await fetch(`/api/notes/${noteId}/tags`, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ tags }) });
+      try {
+        await fetch(`/api/notes/${noteId}/tags`, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ tags }) });
+      } catch {
+        // tags are best-effort; ignore failures
+      }
     }, 500);
     return () => clearTimeout(t);
   }, [tags, noteId]);

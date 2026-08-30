@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Search, BarChart3, Focus, Settings } from "lucide-react";
+import { FileText, Waypoints, BarChart3, Focus, Settings } from "lucide-react";
 
 const items = [
   { href: "/app/notes", label: "Notes", icon: FileText },
-  { href: "/app/graph", label: "Graph", icon: Search },
+  { href: "/app/graph", label: "Graph", icon: Waypoints },
   { href: "/app/digest", label: "Digest", icon: BarChart3 },
   { href: "/app/focus", label: "Focus", icon: Focus },
   { href: "/app/settings", label: "Settings", icon: Settings },

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Sun, Moon, Coffee, MoonStar } from "lucide-react";
-import { nextTheme, THEMES, type Theme } from "@/lib/theme";
+import { nextTheme, type Theme } from "@/lib/theme";
 
 const ICONS: Record<Theme, typeof Sun> = { light: Sun, dark: Moon, sepia: Coffee, night: MoonStar };
 
