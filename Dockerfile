@@ -5,6 +5,14 @@ RUN npm ci
 
 FROM node:24-alpine AS builder
 WORKDIR /app
+ARG DATABASE_URL
+ARG ENCRYPTION_KEY
+ARG BETTER_AUTH_SECRET
+ARG NEXT_PUBLIC_APP_URL
+ENV DATABASE_URL=$DATABASE_URL
+ENV ENCRYPTION_KEY=$ENCRYPTION_KEY
+ENV BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
@@ -12,6 +20,8 @@ RUN npm run build
 FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
