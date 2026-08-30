@@ -6,6 +6,7 @@ import { BacklinkChips } from "./BacklinkChips";
 import { TagEditor } from "./TagEditor";
 import { ImageUploader } from "./ImageUploader";
 import { AiPanel } from "../ai/AiPanel";
+import { SelectionActions } from "../ai/SelectionActions";
 
 export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: string; initialTitle: string; initialBody: string }) {
   const [title, setTitle] = useState(initialTitle);
@@ -13,7 +14,9 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
   const [mode, setMode] = useState<"edit" | "preview" | "split">("split");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [aiOpen, setAiOpen] = useState(false);
+  const [pendingAi, setPendingAi] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const saveSeq = useRef(0);
   const dirty = useRef(false);
 
@@ -43,6 +46,25 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
   const showEdit = mode === "edit" || mode === "split";
   const showPreview = mode === "preview" || mode === "split";
 
+  function handleAiResult(_action: string, result: string, replaceSel: boolean) {
+    if (replaceSel) {
+      const ta = textareaRef.current;
+      if (ta) {
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        dirty.current = true;
+        setBody((b) => b.slice(0, start) + result + b.slice(end));
+        requestAnimationFrame(() => {
+          ta.focus();
+          ta.setSelectionRange(start + result.length, start + result.length);
+        });
+      }
+      return;
+    }
+    setPendingAi(result);
+    setAiOpen(true);
+  }
+
   return (
     <div className="mx-auto flex h-full max-w-5xl flex-col">
       <div className="mb-2 flex items-center justify-between gap-2">
@@ -60,15 +82,16 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
       </div>
       <div className={`flex min-h-0 flex-1 gap-3 ${mode === "split" || aiOpen ? "flex-col md:flex-row" : ""}`}>
         {showEdit && (
-          <textarea value={body} onChange={(e) => { dirty.current = true; setBody(e.target.value); }} placeholder="Write in markdown… [[link]] to another note" className="min-h-40 flex-1 resize-none rounded-lg border border-neutral-200 bg-white p-4 font-mono text-sm outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600" />
+          <textarea ref={textareaRef} value={body} onChange={(e) => { dirty.current = true; setBody(e.target.value); }} placeholder="Write in markdown… [[link]] to another note" className="min-h-40 flex-1 resize-none rounded-lg border border-neutral-200 bg-white p-4 font-mono text-sm outline-none focus:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900 dark:focus:border-neutral-600" />
         )}
         {showPreview && (
           <div className="min-h-40 flex-1 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">
             <Markdown content={body} />
           </div>
         )}
-        {aiOpen && <AiPanel noteId={noteId} onClose={() => setAiOpen(false)} />}
+        {aiOpen && <AiPanel noteId={noteId} onClose={() => setAiOpen(false)} seed={pendingAi} />}
       </div>
+      <SelectionActions noteId={noteId} onResult={handleAiResult} />
       <div className="mt-3 shrink-0">
         <BacklinkChips body={body} />
       </div>

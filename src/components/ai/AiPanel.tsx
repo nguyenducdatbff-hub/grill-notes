@@ -4,7 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Sparkles, X } from "lucide-react";
 
-export function AiPanel({ noteId, onClose }: { noteId: string; onClose: () => void }) {
+export function AiPanel({ noteId, onClose, seed }: { noteId: string; onClose: () => void; seed?: string | null }) {
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({ api: `/api/notes/${noteId}/ai/chat` }),
   });
@@ -18,6 +18,9 @@ export function AiPanel({ noteId, onClose }: { noteId: string; onClose: () => vo
         <button onClick={onClose} className="rounded p-1 text-neutral-400 hover:text-neutral-900 dark:hover:text-white"><X size={14} /></button>
       </div>
       <div className="flex-1 space-y-2 overflow-y-auto p-3 text-sm">
+        {seed && (
+          <div className="max-w-[90%] rounded-lg bg-neutral-100 px-3 py-2 dark:bg-neutral-800">{seed}</div>
+        )}
         {messages.map((m) => (
           <div key={m.id} className={`max-w-[90%] rounded-lg px-3 py-2 ${m.role === "user" ? "ml-auto bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black" : "bg-neutral-100 dark:bg-neutral-800"}`}>
             {m.parts.map((p, i) => (p.type === "text" ? <span key={i}>{p.text}</span> : null))}
