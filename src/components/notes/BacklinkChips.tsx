@@ -13,7 +13,7 @@ export function BacklinkChips({ body }: { body: string }) {
   useEffect(() => {
     if (titles.length === 0) return;
     let active = true;
-    fetch(`/api/notes/resolve?titles=${encodeURIComponent(titles.join(","))}`)
+    fetch(`/api/notes/resolve?titles=${titles.map(encodeURIComponent).join(",")}`)
       .then((r) => r.json())
       .then(({ found }: { found: { title: string; id: string }[] }) => {
         if (active) setFound(Object.fromEntries(found.map((f) => [f.title, f.id])));
@@ -23,6 +23,7 @@ export function BacklinkChips({ body }: { body: string }) {
 
   async function createMissing(title: string) {
     const res = await fetch("/api/notes", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ title }) });
+    if (!res.ok) return;
     const note = await res.json();
     router.push(`/app/notes/${note.id}`);
   }
