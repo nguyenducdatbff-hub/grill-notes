@@ -6,19 +6,23 @@ import { PRESETS, fmt, usePomodoro, type Preset } from "@/lib/pomodoro";
 export function Timer({ onComplete }: { onComplete: (preset: Preset, seconds: number) => void }) {
   const { secondsLeft, total, running, start, pause, reset } = usePomodoro();
   const presetRef = useRef<Preset>("pomodoro");
-  const completedRef = useRef(false);
+  const audioCtx = useRef<AudioContext | null>(null);
+
+  function beep() {
+    if (typeof AudioContext === "undefined") return;
+    if (!audioCtx.current) audioCtx.current = new AudioContext();
+    const ctx = audioCtx.current;
+    if (ctx.state === "suspended") void ctx.resume();
+    const osc = ctx.createOscillator();
+    osc.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.start();
+    osc.stop(ctx.currentTime + 0.4);
+  }
 
   useEffect(() => {
     if (secondsLeft === 0 && running) {
-      completedRef.current = true;
-      if (typeof AudioContext !== "undefined") {
-        const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        osc.connect(ctx.destination);
-        osc.frequency.value = 880;
-        osc.start();
-        osc.stop(ctx.currentTime + 0.4);
-      }
+      beep();
       setTimeout(() => onComplete(presetRef.current, total), 200);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -39,11 +43,11 @@ export function Timer({ onComplete }: { onComplete: (preset: Preset, seconds: nu
       </div>
       <div className="flex gap-1">
         {(Object.keys(PRESETS) as Preset[]).map((p) => (
-          <button key={p} onClick={() => reset(PRESETS[p])} className="rounded-md px-2 py-1 text-xs capitalize text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">{p}</button>
+          <button key={p} onClick={() => { presetRef.current = p; reset(PRESETS[p]); }} className="rounded-md px-2 py-1 text-xs capitalize text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">{p}</button>
         ))}
       </div>
       <div className="flex gap-2">
-        <button onClick={running ? pause : start} className="flex items-center gap-1 rounded-full bg-neutral-900 px-5 py-2 text-white dark:bg-neutral-100 dark:text-black">
+        <button onClick={() => { if (!running) { if (!audioCtx.current) audioCtx.current = new AudioContext(); start(); } else pause(); }} className="flex items-center gap-1 rounded-full bg-neutral-900 px-5 py-2 text-white dark:bg-neutral-100 dark:text-black">
           {running ? <Pause size={16} /> : <Play size={16} />} {running ? "Pause" : "Start"}
         </button>
         <button onClick={() => reset()} className="rounded-full border p-2 text-neutral-500"><RotateCcw size={16} /></button>
