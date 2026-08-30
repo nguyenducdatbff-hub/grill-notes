@@ -89,7 +89,7 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
             <Markdown content={body} />
           </div>
         )}
-        {aiOpen && <AiPanel noteId={noteId} onClose={() => setAiOpen(false)} seed={pendingAi} />}
+        {aiOpen && <AiPanel noteId={noteId} onClose={() => { setAiOpen(false); setPendingAi(null); }} seed={pendingAi} />}
       </div>
       <SelectionActions noteId={noteId} onResult={handleAiResult} />
       <div className="mt-3 shrink-0">
