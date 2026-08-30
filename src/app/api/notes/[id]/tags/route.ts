@@ -8,6 +8,16 @@ import { syncTagLists } from "@/lib/tags";
 
 const Schema = z.object({ tags: z.array(z.string().max(50)).max(50) });
 
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const user = await requireUser();
+  const { id } = await params;
+  const rows = await db.select({ name: tags.name })
+    .from(noteTags)
+    .innerJoin(tags, eq(tags.id, noteTags.tagId))
+    .where(and(eq(noteTags.noteId, id), eq(tags.userId, user.id)));
+  return NextResponse.json(rows.map((r) => r.name));
+}
+
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await requireUser();
   const { id } = await params;
