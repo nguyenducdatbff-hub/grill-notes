@@ -25,9 +25,12 @@ export async function PUT(req: Request) {
   const user = await requireUser();
   const body = PutSchema.parse(await req.json());
   const existing = await db.select().from(aiKeys).where(eq(aiKeys.userId, user.id));
+  if (!body.apiKey && existing.length === 0) {
+    return NextResponse.json({ error: "API key required on first save" }, { status: 400 });
+  }
   const fields = { provider: body.provider, model: body.model, updatedAt: new Date() };
   if (body.apiKey) Object.assign(fields, { encryptedKey: encrypt(body.apiKey) });
   if (existing.length) await db.update(aiKeys).set(fields).where(eq(aiKeys.userId, user.id));
-  else await db.insert(aiKeys).values({ userId: user.id, encryptedKey: encrypt(""), ...fields });
+  else await db.insert(aiKeys).values({ userId: user.id, encryptedKey: encrypt(body.apiKey ?? ""), ...fields });
   return NextResponse.json({ ok: true });
 }

@@ -8,6 +8,10 @@ import { validateImage } from "@/lib/images";
 
 export async function POST(req: Request) {
   const user = await requireUser();
+  const contentLength = Number(req.headers.get("content-length"));
+  if (!Number.isNaN(contentLength) && contentLength > 6 * 1024 * 1024) {
+    return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+  }
   const form = await req.formData();
   const file = form.get("file");
   if (!(file instanceof File)) return NextResponse.json({ error: "No file" }, { status: 400 });

@@ -24,25 +24,57 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
   const saveSeq = useRef(0);
   const dirty = useRef(false);
   const editSeq = useRef(0);
+  const pendingRef = useRef<{ title: string; body: string } | null>(null);
+  const lastSavedRef = useRef<{ title: string; body: string } | null>(null);
+  const inFlightRef = useRef<{ title: string; body: string } | null>(null);
 
   useEffect(() => {
     if (!dirty.current) return;
+    pendingRef.current = { title, body };
     const seq = ++saveSeq.current;
     timer.current = setTimeout(async () => {
       setStatus("saving");
+      inFlightRef.current = { title, body };
       try {
         const res = await fetch(`/api/notes/${noteId}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ title, body }) });
         if (!res.ok) throw new Error("save failed");
+        lastSavedRef.current = { title, body };
+        if (pendingRef.current?.title === title && pendingRef.current?.body === body) pendingRef.current = null;
         if (seq === saveSeq.current) {
           setStatus("saved");
           setSavedSnap({ title, body });
         }
       } catch {
         if (seq === saveSeq.current) setStatus("error");
+      } finally {
+        if (inFlightRef.current?.title === title && inFlightRef.current?.body === body) inFlightRef.current = null;
       }
     }, 800);
     return () => { if (timer.current) clearTimeout(timer.current); };
   }, [title, body, noteId]);
+
+  useEffect(() => {
+    const flush = () => {
+      const pending = pendingRef.current;
+      if (!pending) return;
+      const last = lastSavedRef.current;
+      if (last && last.title === pending.title && last.body === pending.body) {
+        pendingRef.current = null;
+        return;
+      }
+      const inFlight = inFlightRef.current;
+      if (inFlight && inFlight.title === pending.title && inFlight.body === pending.body) return;
+      pendingRef.current = null;
+      fetch(`/api/notes/${noteId}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(pending), keepalive: true }).catch(() => {});
+    };
+    const onBeforeUnload = () => flush();
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      if (timer.current) clearTimeout(timer.current);
+      flush();
+    };
+  }, [noteId]);
 
   useEffect(() => {
     if (status === "saved" || status === "error") {

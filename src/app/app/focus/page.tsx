@@ -18,7 +18,7 @@ export default function FocusPage() {
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 pt-6">
       <h1 className="text-2xl font-semibold">Focus</h1>
       <button onClick={() => setFocused(true)} className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white"><Maximize2 size={14} /> Enter focus mode</button>
-      <Timer onComplete={(p, s) => record(p, s)} />
+      {focused ? null : <Timer onComplete={(p, s) => record(p, s)} />}
       <MiniTasks />
       <FocusStats />
       {focused && <FocusMode onClose={() => setFocused(false)} onComplete={(s) => record("pomodoro", s)} />}

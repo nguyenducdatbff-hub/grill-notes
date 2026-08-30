@@ -32,7 +32,7 @@ export function usePomodoro(initial: number = PRESETS.pomodoro) {
     if (secondsLeft === 0 && running) setRunning(false);
   }, [secondsLeft, running]);
 
-  const start = () => { endAt.current = Date.now() + secondsLeft * 1000; setRunning(true); };
+  const start = () => { if (secondsLeft <= 0) return; endAt.current = Date.now() + secondsLeft * 1000; setRunning(true); };
   const pause = () => { endAt.current = null; setRunning(false); };
   const reset = (next?: number) => { const t = next ?? total; setTotal(t); setSecondsLeft(t); endAt.current = null; setRunning(false); };
 
