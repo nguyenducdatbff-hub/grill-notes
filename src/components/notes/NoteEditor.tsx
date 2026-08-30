@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Eye, Pencil } from "lucide-react";
 import { Markdown } from "./Markdown";
+import { BacklinkChips } from "./BacklinkChips";
 
 export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: string; initialTitle: string; initialBody: string }) {
   const [title, setTitle] = useState(initialTitle);
@@ -57,6 +58,9 @@ export function NoteEditor({ noteId, initialTitle, initialBody }: { noteId: stri
             <Markdown content={body} />
           </div>
         )}
+      </div>
+      <div className="mt-3 shrink-0">
+        <BacklinkChips body={body} />
       </div>
     </div>
   );
