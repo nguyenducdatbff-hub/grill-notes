@@ -8,6 +8,7 @@ export const DEFAULT_MODELS: Record<string, string> = {
   anthropic: "claude-sonnet-4-5",
   google: "gemini-2.5-flash",
   openrouter: "deepseek/deepseek-chat",
+  deepseek: "deepseek-chat",
 };
 
 export type AiProvider = keyof typeof DEFAULT_MODELS;
@@ -19,6 +20,8 @@ export function getModel(provider: string, model: string, apiKey: string) {
     case "google": return createGoogle({ apiKey })(model);
     case "openrouter":
       return createOpenAICompatible({ name: "openrouter", baseURL: "https://openrouter.ai/api/v1", apiKey })(model);
+    case "deepseek":
+      return createOpenAICompatible({ name: "deepseek", baseURL: "https://api.deepseek.com", apiKey })(model);
     default: throw new Error(`Unknown provider: ${provider}`);
   }
 }

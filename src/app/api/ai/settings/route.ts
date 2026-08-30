@@ -8,7 +8,7 @@ import { encrypt } from "@/lib/crypto";
 import { DEFAULT_MODELS } from "@/lib/ai";
 
 const PutSchema = z.object({
-  provider: z.enum(["openai", "anthropic", "google", "openrouter"]),
+  provider: z.enum(["openai", "anthropic", "google", "openrouter", "deepseek"]),
   model: z.string().max(200),
   apiKey: z.string().min(1).max(2000).optional(),
 });
