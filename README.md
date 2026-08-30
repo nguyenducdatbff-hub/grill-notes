@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Grill
 
-## Getting Started
+A notes / AI / focus web app built with Next.js, Postgres, and Drizzle.
 
-First, run the development server:
+## Local development
+
+Prerequisites: Node.js 20+, a local Postgres database.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create your `.env` file from the template:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env` and set your `DATABASE_URL` (and keys if you use AI features or auth).
 
-## Learn More
+Run the database migrations, then start the dev server:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run db:migrate
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Other useful commands:
 
-## Deploy on Vercel
+```bash
+npm test        # run the test suite
+npm run typecheck
+npm run lint
+npm run build   # production build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploying to Railway
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Railway builds this repo with the included `Dockerfile` (`railway.json` configures the Dockerfile builder and the `/` healthcheck). The Dockerfile runs `npm run db:migrate` during the build step, so migrations are applied before the app starts.
+
+Deploy flow:
+
+1. Create a new project on [Railway](https://railway.app).
+2. Add a **Postgres** plugin to the project.
+3. Add a service from this repository (deploy from GitHub or local CLI).
+4. Set the environment variables below (for both build and run).
+5. Deploy, then open the generated `*.up.railway.app` URL.
+
+### Environment variables
+
+| Variable              | Description                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`        | Postgres connection URL (provided by the Railway Postgres plugin).                         |
+| `ENCRYPTION_KEY`      | 64 hex chars. Generate with: `openssl rand -hex 32`                                        |
+| `BETTER_AUTH_SECRET`  | Long random string. Generate with: `openssl rand -base64 32`                               |
+| `NEXT_PUBLIC_APP_URL` | The public URL of your app, e.g. `https://grill-production.up.railway.app`                 |
+
+> **Note:** because `npm run db:migrate` runs inside the Dockerfile, `DATABASE_URL` and `NEXT_PUBLIC_*` variables must be available **at build time** on Railway. In the Railway dashboard, set variables under **Variables** for both build and run so the migration step can reach the database and Next.js can inline public values during the build.
