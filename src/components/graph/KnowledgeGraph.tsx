@@ -32,9 +32,10 @@ export function KnowledgeGraph() {
       .force("center", forceCenter(size.w / 2, size.h / 2))
       .force("collide", forceCollide<GNode>(18));
 
-    const lineSel = select(el).selectAll("line").data(links);
+    const g = select(el).select("g");
+    const lineSel = g.selectAll("line").data(links);
     lineSel.join("line").attr("stroke", "#a1a1aa");
-    const circleSel = select(el).selectAll("circle").data(nodes);
+    const circleSel = g.selectAll("circle").data(nodes);
     const circle = circleSel.join("circle")
       .attr("r", (d) => 6 + Math.min(14, d.links * 2))
       .attr("fill", "#171717")
@@ -42,7 +43,7 @@ export function KnowledgeGraph() {
       .on("click", (_e, d) => router.push(`/app/notes/${d.id}`));
     circle.append("title").text((d) => d.title);
 
-    const labelSel = select(el).selectAll("text").data(nodes);
+    const labelSel = g.selectAll("text").data(nodes);
     labelSel.join("text")
       .attr("dx", 12).attr("dy", 4)
       .style("font-size", "11px")
@@ -50,15 +51,15 @@ export function KnowledgeGraph() {
       .text((d) => d.title);
 
     sim.on("tick", () => {
-      select(el).selectAll<SVGLineElement, GLinkDatum>("line")
+      g.selectAll<SVGLineElement, GLinkDatum>("line")
         .attr("x1", (d) => d.source.x!).attr("y1", (d) => d.source.y!)
         .attr("x2", (d) => d.target.x!).attr("y2", (d) => d.target.y!);
-      select(el).selectAll<SVGCircleElement, GNode>("circle").attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
-      select(el).selectAll<SVGTextElement, GNode>("text").attr("x", (d) => d.x!).attr("y", (d) => d.y!);
+      g.selectAll<SVGCircleElement, GNode>("circle").attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
+      g.selectAll<SVGTextElement, GNode>("text").attr("x", (d) => d.x!).attr("y", (d) => d.y!);
     });
 
     select(el).call(zoom<SVGSVGElement, unknown>().on("zoom", (e) => {
-      select(el).select("g").attr("transform", e.transform);
+      g.attr("transform", e.transform);
     }));
 
     return () => {
