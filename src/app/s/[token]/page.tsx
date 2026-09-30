@@ -4,6 +4,8 @@ import { db } from "@/db";
 import { notes } from "@/db/schema";
 import { Markdown } from "@/components/notes/Markdown";
 
+export const dynamic = "force-dynamic";
+
 export default async function SharePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const [note] = await db.select().from(notes).where(eq(notes.shareToken, token));

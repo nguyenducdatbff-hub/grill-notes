@@ -5,6 +5,8 @@ import { notes } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { NoteEditor } from "@/components/notes/NoteEditor";
 
+export const dynamic = "force-dynamic";
+
 export default async function NotePage({ params }: { params: Promise<{ id: string }> }) {
   const user = await requireUser();
   const { id } = await params;
